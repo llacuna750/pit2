@@ -9,10 +9,11 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+    public function up() // Step 3: Create Roles and Update User Model
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->string('role')->default('user');
+            $table->string('avatar')->nullable();
         });
     }
 

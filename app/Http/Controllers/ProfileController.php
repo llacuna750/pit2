@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Storage; // ✅ Step 7: Upload Avatar + Update Profile
 use App\Http\Requests\ProfileUpdateRequest;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -16,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [
+        return view('profile.edit', [   
             'user' => $request->user(),
         ]);
     }
@@ -24,18 +25,39 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
+    
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+    public function update(ProfileUpdateRequest $request): RedirectResponse // ✅ Step 7: Upload Avatar + Update Profile
+    {
+        $user = $request->user();
+        $data = $request->validated();
+
+        // Handle avatar upload if exists
+        if ($request->hasFile('avatar')) {
+            // Delete old avatar if exists
+            if ($user->avatar) {
+                Storage::disk('public')->delete($user->avatar);
+            }
+
+            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
         }
 
-        $request->user()->save();
+        // Allow role change only by admin or if updating their own role
+        if ($request->user()->role === 'admin' && $request->filled('role')) {
+            $data['role'] = $request->input('role');
+        }
+
+        $user->fill($data);
+
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
+        }
+
+        $user->save();
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
+
 
     /**
      * Delete the user's account.
