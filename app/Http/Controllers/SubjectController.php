@@ -3,16 +3,41 @@
 namespace App\Http\Controllers;
 
 use App\Models\Subject;
+use App\Models\Course;
 use Illuminate\Http\Request;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class SubjectController extends Controller
 {
+
+    public function exportAll()
+    {
+        $subjects = Subject::with('course')->get();
+        $pdf = Pdf::loadView('pdf.all_subjects', compact('subjects'));
+        return $pdf->download('all_subjects.pdf');
+    }
+
+    public function exportSingle(Subject $subject)
+    {
+        $subject->load('course');
+        $pdf = Pdf::loadView('pdf.subject', compact('subject'));
+        return $pdf->download("subject_{$subject->id}.pdf");
+    }
+
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $search = $request->input('search');
+
+        $subjects = Subject::with('course')
+            ->when($search, function ($query, $search) {
+                return $query->where('name', 'like', "%{$search}%");
+            })
+            ->paginate(10);
+
+        return view('subjects.index', compact('subjects', 'search'));
     }
 
     /**
@@ -20,7 +45,8 @@ class SubjectController extends Controller
      */
     public function create()
     {
-        //
+        $courses = Course::all();
+        return view('subjects.create', compact('courses'));
     }
 
     /**
@@ -28,7 +54,14 @@ class SubjectController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        Subject::create($validated);
+
+        return redirect()->route('subjects.index')->with('success', 'Subject created successfully.');
     }
 
     /**
@@ -36,7 +69,8 @@ class SubjectController extends Controller
      */
     public function show(Subject $subject)
     {
-        //
+        // Optional: show detail view
+        return view('subjects.show', compact('subject'));
     }
 
     /**
@@ -44,7 +78,8 @@ class SubjectController extends Controller
      */
     public function edit(Subject $subject)
     {
-        //
+        $courses = Course::all();
+        return view('subjects.edit', compact('subject', 'courses'));
     }
 
     /**
@@ -52,7 +87,14 @@ class SubjectController extends Controller
      */
     public function update(Request $request, Subject $subject)
     {
-        //
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'course_id' => 'required|exists:courses,id',
+        ]);
+
+        $subject->update($validated);
+
+        return redirect()->route('subjects.index')->with('success', 'Subject updated successfully.');
     }
 
     /**
@@ -60,6 +102,8 @@ class SubjectController extends Controller
      */
     public function destroy(Subject $subject)
     {
-        //
+        $subject->delete();
+
+        return redirect()->route('subjects.index')->with('success', 'Subject deleted successfully.');
     }
 }

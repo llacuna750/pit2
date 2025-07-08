@@ -25,6 +25,9 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
+            'avatar' => ['nullable', 'image', 'max:2048'], // ✅ allow image upload (max 2MB)
+            'remove_avatar' => ['nullable', 'boolean'], // ✅ allow optional checkbox input
+            'role' => ['nullable', 'in:admin,staff,user'], // ✅ optional for admin users only
         ];
     }
 }

@@ -17,7 +17,7 @@ class ProfileController extends Controller
      */
     public function edit(Request $request): View
     {
-        return view('profile.edit', [   
+        return view('profile.edit', [
             'user' => $request->user(),
         ]);
     }
@@ -25,24 +25,31 @@ class ProfileController extends Controller
     /**
      * Update the user's profile information.
      */
-    
-
     public function update(ProfileUpdateRequest $request): RedirectResponse // ✅ Step 7: Upload Avatar + Update Profile
     {
         $user = $request->user();
         $data = $request->validated();
 
+        // Handle avatar removal if requested
+        if ($request->input('remove_avatar') && $user->avatar) {
+            Storage::disk('public')->delete('avatars/' . $user->avatar);
+            $data['avatar'] = null;
+        }
+
         // Handle avatar upload if exists
         if ($request->hasFile('avatar')) {
             // Delete old avatar if exists
             if ($user->avatar) {
-                Storage::disk('public')->delete($user->avatar);
+                Storage::disk('public')->delete('avatars/' . $user->avatar);
             }
 
-            $data['avatar'] = $request->file('avatar')->store('avatars', 'public');
+            $file = $request->file('avatar');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->storeAs('public/avatars', $filename);
+            $data['avatar'] = $filename;
         }
 
-        // Allow role change only by admin or if updating their own role
+        // Allow role change only by admin
         if ($request->user()->role === 'admin' && $request->filled('role')) {
             $data['role'] = $request->input('role');
         }
@@ -57,7 +64,6 @@ class ProfileController extends Controller
 
         return Redirect::route('profile.edit')->with('status', 'profile-updated');
     }
-
 
     /**
      * Delete the user's account.

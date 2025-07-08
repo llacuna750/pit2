@@ -17,8 +17,15 @@ class User extends Authenticatable
      *
      * @var list<string>
      */
-    protected $fillable = ['name', 'email', 'password', 'role', 'avatar']; // ✅ Step 3: Create Roles and Update User Model
+    // protected $fillable = ['name', 'email', 'password', 'role', 'avatar']; // ✅ Step 3: Create Roles and Update User Model
 
+    protected $fillable = [
+        'name',
+        'email',
+        'password',
+        'role',
+        'avatar' // add this if not yet included
+    ];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -29,6 +36,8 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    
 
     /**
      * Get the attributes that should be cast.

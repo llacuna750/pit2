@@ -14,7 +14,7 @@
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')"
                         class="inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium leading-5 transition-all duration-200 ease-in-out hover:border-blue-300 dark:hover:border-blue-400 focus:outline-none focus:border-blue-400 dark:focus:border-blue-300">
-                        {{ __('LMS Dashboard') }}
+                        {{ __('Dashboard') }}
                     </x-nav-link>
                 </div>
             </div>
@@ -24,6 +24,17 @@
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
                         <button class="inline-flex items-center px-4 py-2 border border-transparent text-sm leading-4 font-medium rounded-lg text-slate-600 dark:text-slate-300 bg-white dark:bg-gray-800 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-all duration-200 ease-in-out shadow-sm hover:shadow-md">
+
+                            <!-- ✅ Avatar Image -->
+                            @if(Auth::user()->avatar)
+                            <img src="{{ asset('storage/avatars/' . Auth::user()->avatar) }}" alt="{{ Auth::user()->name }}" class="w-8 h-8 rounded-full object-cover mr-2">
+                            @else
+                            <div class="w-8 h-8 bg-slate-400 rounded-full mr-2 flex items-center justify-center text-white text-xs">
+                                {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                            </div>
+                            @endif
+
+                            <!-- Username -->
                             <div class="font-medium">{{ Auth::user()->name }}</div>
 
                             <div class="ms-2">
@@ -36,19 +47,15 @@
 
                     <x-slot name="content">
                         <div class="py-1 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-slate-200 dark:border-gray-700">
-                            <x-dropdown-link :href="route('profile.edit')"
-                                class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-150">
+                            <x-dropdown-link :href="route('profile.edit')">
                                 {{ __('Profile') }}
                             </x-dropdown-link>
 
                             <!-- Authentication -->
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-
                                 <x-dropdown-link :href="route('logout')"
-                                    onclick="event.preventDefault();
-                                                    this.closest('form').submit();"
-                                    class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-gray-700 hover:text-slate-900 dark:hover:text-slate-100 transition-colors duration-150">
+                                    onclick="event.preventDefault(); this.closest('form').submit();">
                                     {{ __('Log Out') }}
                                 </x-dropdown-link>
                             </form>
@@ -56,6 +63,7 @@
                     </x-slot>
                 </x-dropdown>
             </div>
+
 
             <!-- Hamburger -->
             <div class="-me-2 flex items-center sm:hidden">
