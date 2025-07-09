@@ -24,8 +24,13 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
-        'avatar' // add this if not yet included
+        'avatar', // add this if not yet included
     ];
+
+    public function enrollments()
+    {
+        return $this->hasMany(Enrollment::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.

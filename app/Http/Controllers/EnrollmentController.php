@@ -45,7 +45,7 @@ class EnrollmentController extends Controller
                     $q->where('name', 'like', "%{$search}%");
                 });
             })
-            ->paginate(10);
+            ->paginate(3);
 
         return view('enrollments.index', compact('enrollments', 'search'));
     }

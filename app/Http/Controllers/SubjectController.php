@@ -35,7 +35,7 @@ class SubjectController extends Controller
             ->when($search, function ($query, $search) {
                 return $query->where('name', 'like', "%{$search}%");
             })
-            ->paginate(10);
+            ->paginate(3);
 
         return view('subjects.index', compact('subjects', 'search'));
     }

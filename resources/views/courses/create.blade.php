@@ -1,19 +1,14 @@
-@extends('layouts.app')
-
-@section('content')
-<div class="p-4">
-    <h1 class="text-xl font-bold mb-4">Create Course</h1>
-
-    <form action="{{ route('courses.store') }}" method="POST">
-        @csrf
-        <label class="block mb-2">Title:</label>
-        <input type="text" name="title" class="border p-2 w-full mb-4" required>
-
-        <label class="block mb-2">Description:</label>
-        <textarea name="description" class="border p-2 w-full mb-4"></textarea>
-
-        <button class="bg-blue-500 text-white p-2 rounded">Save</button>
-        <a href="{{ route('courses.index') }}" class="text-gray-700 ml-4">Cancel</a>
-    </form>
-</div>
-@endsection
+<x-app-layout>
+    <div class="max-w-2xl mx-auto py-6">
+        <h1 class="text-2xl font-bold mb-4 text-slate-800 dark:text-white">Add Course</h1>
+        <form method="POST" action="{{ route('courses.store') }}" class="bg-white dark:bg-gray-800 p-6 rounded shadow">
+            @csrf
+            <div class="mb-4">
+                <label class="block text-gray-700 dark:text-gray-200">Title</label>
+                <input type="text" name="title" class="w-full border rounded px-3 py-2 dark:bg-gray-700 dark:text-white" required>
+            </div>
+            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Save</button>
+            <a href="{{ route('courses.index') }}" class="ml-2 text-gray-600 hover:underline">Cancel</a>
+        </form>
+    </div>
+</x-app-layout>
