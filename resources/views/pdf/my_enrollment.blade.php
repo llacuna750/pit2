@@ -2,190 +2,83 @@
 <html>
 
 <head>
-    <title>My Enrollment PDF</title>
+    <meta charset="utf-8">
+    <title>My Enrollments Report</title>
     <style>
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            min-height: 100vh;
-            box-sizing: border-box;
+            font-family: Arial, sans-serif;
         }
 
-        .certificate-container {
-            background: white;
-            border-radius: 15px;
-            padding: 50px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .certificate-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 8px;
-            background: linear-gradient(90deg, #f093fb, #f5576c);
-        }
-
-        .certificate-container::after {
-            content: '';
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            right: 20px;
-            bottom: 20px;
-            border: 2px solid #f093fb;
-            border-radius: 10px;
-            opacity: 0.3;
-        }
-
-        h2 {
-            color: #2d3748;
-            font-size: 2.8em;
-            margin-bottom: 40px;
+        .header {
             text-align: center;
-            font-weight: 300;
-            letter-spacing: -0.5px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .certificate-body {
-            position: relative;
-            z-index: 1;
-        }
-
-        .info-section {
-            background: #f8fafc;
-            border-radius: 12px;
-            padding: 25px;
             margin-bottom: 20px;
-            border-left: 5px solid #f093fb;
-            position: relative;
-            transition: transform 0.3s ease;
         }
 
-        .info-section:hover {
-            transform: translateX(5px);
+        .title {
+            font-size: 24px;
+            font-weight: bold;
         }
 
-        .info-section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 60px;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(240, 147, 251, 0.1));
-            border-radius: 0 12px 12px 0;
+        .date {
+            font-size: 14px;
+            color: #666;
         }
 
-        .info-label {
-            font-weight: 700;
-            color: #4a5568;
-            font-size: 1em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: block;
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
-        .info-value {
-            color: #2d3748;
-            font-size: 1.3em;
-            font-weight: 500;
-            line-height: 1.4;
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
 
-        .decorative-line {
-            height: 3px;
-            background: linear-gradient(90deg, transparent, #f093fb, #f5576c, transparent);
-            margin: 35px 0;
-            border-radius: 2px;
+        th {
+            background-color: #f2f2f2;
         }
 
         .footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 2px solid #e2e8f0;
-            position: relative;
-            z-index: 1;
-        }
-
-        .footer p {
-            color: #718096;
-            font-size: 0.95em;
-            margin: 0;
-            font-style: italic;
-        }
-
-        .accent {
-            color: #f093fb;
-            font-weight: 600;
-        }
-
-        .signature-line {
-            width: 200px;
-            height: 2px;
-            background: #e2e8f0;
-            margin: 30px auto 10px;
-        }
-
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 8em;
-            color: rgba(240, 147, 251, 0.05);
-            font-weight: 900;
-            z-index: 0;
-            pointer-events: none;
+            margin-top: 30px;
+            text-align: right;
+            font-size: 12px;
         }
     </style>
 </head>
 
 <body>
-    <div class="certificate-container">
-        <div class="watermark">CERTIFIED</div>
+    <div class="header">
+        <div class="title">My All Enrollments Report</div>
+        <div class="date">Generated on: {{ now()->format('F j, Y') }}</div>
+    </div>
 
-        <h2>My Enrollment Record</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Course</th>
+                <th>Enrollment Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($enrollments as $enrollment)
+            <tr>
+                <td>{{ $enrollment->subject->name }}</td>
+                <td>{{ $enrollment->subject->course->title ?? 'N/A' }}</td>
+                <td>{{ $enrollment->enrolled_at->format('M d, Y') }}</td>
+                <td>Active</td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-        <div class="certificate-body">
-            <div class="info-section">
-                <span class="info-label">Subject</span>
-                <div class="info-value">{{ $enrollment->subject->name }}</div>
-            </div>
-
-            <div class="info-section">
-                <span class="info-label">Enrolled On</span>
-                <div class="info-value">{{ $enrollment->enrolled_at->format('F d, Y') }}</div>
-            </div>
-
-            <div class="decorative-line"></div>
-
-            <div class="info-section">
-                <span class="info-label">Generated By</span>
-                <div class="info-value">{{ Auth::user()->name }}</div>
-            </div>
-
-            <div class="info-section">
-                <span class="info-label">Generated On</span>
-                <div class="info-value">{{ now()->format('F d, Y') }}</div>
-            </div>
-        </div>
-
-        <div class="footer">
-            <div class="signature-line"></div>
-            <p>This is an official enrollment record generated by the system.</p>
-        </div>
+    <div class="footer">
+        <p>Total Enrollments: {{ $enrollments->count() }}</p>
+        <p>Generated by: {{ Auth::user()->name }}</p>
     </div>
 </body>
 

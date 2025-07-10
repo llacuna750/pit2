@@ -55,10 +55,11 @@ Route::middleware(['auth', 'role:admin,staff'])->group(function () {
     Route::get('/api/enrollments/chart', [DashboardController::class, 'enrollmentChart'])->name('dashboard.enrollment.chart');
 });
 
-// ✅ User-specific routes (Students)
+// Student routes
 Route::middleware(['auth', 'role:user'])->group(function () {
     Route::get('/my-enrollments', [EnrollmentController::class, 'myEnrollments'])->name('my.enrollments');
     Route::get('/my-enrollments/{enrollment}/pdf', [EnrollmentController::class, 'exportMyEnrollment'])->name('my.enrollment.pdf');
+    Route::get('/my-enrollments/export-all', [EnrollmentController::class, 'exportAllMyEnrollments'])->name('my.enrollments.export-all');
 });
 
 // Avatar-specific routes

@@ -16,20 +16,24 @@ class EnrollmentController extends Controller
     {
         $enrollments = Enrollment::with('subject')
             ->where('user_id', Auth::id())
-            ->paginate(10);
+            ->paginate(5);
 
         return view('students.my_enrollments', compact('enrollments'));
     }
 
+    // In EnrollmentController.php
     public function exportMyEnrollment(Enrollment $enrollment)
     {
         if ($enrollment->user_id !== Auth::id()) {
             abort(403, 'Unauthorized');
         }
 
-        $enrollment->load('subject');
-        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('pdf.my_enrollment', compact('enrollment'));
-        return $pdf->download("my_enrollment_{$enrollment->id}.pdf");
+        $enrollment->load(['subject.course']); // Eager load relationships
+
+        // Pass the single enrollment in an array to match the view's expectations
+        return PDF::loadView('pdf.my_enrollment', [
+            'enrollments' => collect([$enrollment]) // Wrap in collection to maintain count() etc
+        ])->download("my_enrollment_{$enrollment->id}.pdf");
     }
 
 
@@ -111,5 +115,20 @@ class EnrollmentController extends Controller
         $enrollment->load(['user', 'subject']);
         $pdf = Pdf::loadView('pdf.enrollment', compact('enrollment'));
         return $pdf->download("enrollment_{$enrollment->id}.pdf");
+    }
+
+    public function exportAllMyEnrollments()
+    {
+        $enrollments = Enrollment::with(['subject.course'])
+            ->where('user_id', Auth::id())
+            ->get();
+
+        if ($enrollments->isEmpty()) {
+            return redirect()->route('my.enrollments')
+                ->with('error', 'No enrollments found to export.');
+        }
+
+        $pdf = PDF::loadView('pdf.my_enrollment', compact('enrollments'));
+        return $pdf->download('my_enrollments_report_' . now()->format('Y-m-d') . '.pdf');
     }
 }
